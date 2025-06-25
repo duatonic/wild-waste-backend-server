@@ -170,7 +170,7 @@ def get_all_reports():
     try:
         query = """
             SELECT tr.id, tr.user_id, tr.latitude, tr.longitude, tr.trash_type, 
-                   tr.quantity, tr.notes, tr.reported_at, u.username
+                   tr.quantity, tr.notes, tr.reported_at, tr.image_base64, u.username
             FROM trash_reports tr
             JOIN users u ON tr.user_id = u.id
         """
@@ -217,6 +217,38 @@ def get_user_reports(user_id):
         cursor.close()
         conn.close()
 
+@app.route('/reports/<int:report_id>', methods=['DELETE'])
+def delete_report(report_id):
+    """
+    Deletes a specific trash report by its ID.
+    NOTE: In a real-world app, you should add a security check here to ensure
+    the user making the request is the one who created the report.
+    """
+    conn = create_db_connection()
+    if not conn:
+        return jsonify({"status": "error", "message": "Database connection failed"}), 500
+
+    cursor = conn.cursor()
+    try:
+        # Check if the report exists before deleting
+        cursor.execute("SELECT id FROM trash_reports WHERE id = %s", (report_id,))
+        if cursor.fetchone() is None:
+            return jsonify({"status": "error", "message": "Report not found"}), 404
+
+        # Delete the report
+        cursor.execute("DELETE FROM trash_reports WHERE id = %s", (report_id,))
+        conn.commit()
+
+        if cursor.rowcount > 0:
+            return jsonify({"status": "success", "message": "Report deleted successfully"}), 200
+        else:
+            return jsonify({"status": "error", "message": "Report not found or already deleted"}), 404
+
+    except Error as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
 
 if __name__ == '__main__':
     # Runs the Flask app.
