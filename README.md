@@ -1,5 +1,5 @@
 # wild-waste-backend-server
-Backend API server for Wild Waste
+Backend API server for [Wild Waste](https://github.com/duatonic/wild-waste.git).
 
 To run the server, install these requirements:
 ```
