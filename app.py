@@ -1,4 +1,3 @@
-# app.py
 # Backend server for the WildWaste application using Flask.
 
 from flask import Flask, request, jsonify
@@ -8,8 +7,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
-# --- Database Configuration ---
-# IMPORTANT: Replace these values with your actual MySQL database credentials.
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
@@ -17,9 +14,11 @@ DB_CONFIG = {
     'database': 'wildwaste_db'
 }
 
-# --- Database Connection Helper ---
+# Database Connection Helper
 def create_db_connection():
-    """Creates and returns a connection to the MySQL database."""
+    """
+    Creates and returns a connection to the MySQL database.
+    """
     try:
         connection = mysql.connector.connect(**DB_CONFIG)
         if connection.is_connected():
@@ -28,13 +27,9 @@ def create_db_connection():
         print(f"Error while connecting to MySQL: {e}")
         return None
 
-# --- API Endpoints ---
-
 @app.route('/')
 def index():
     return "Welcome to the WildWaste Backend API!"
-
-# --- User Management Endpoints ---
 
 @app.route('/register', methods=['POST'])
 def register_user():
@@ -110,8 +105,6 @@ def login_user():
     finally:
         cursor.close()
         conn.close()
-
-# --- Trash Report Endpoints ---
 
 @app.route('/reports', methods=['POST'])
 def add_report():
@@ -221,8 +214,7 @@ def get_user_reports(user_id):
 def delete_report(report_id):
     """
     Deletes a specific trash report by its ID.
-    NOTE: In a real-world app, you should add a security check here to ensure
-    the user making the request is the one who created the report.
+    TODO: Add a security check here to ensure the user making the request is the one who created the report.
     """
     conn = create_db_connection()
     if not conn:
@@ -251,6 +243,5 @@ def delete_report(report_id):
         conn.close()
 
 if __name__ == '__main__':
-    # Runs the Flask app.
-    # Use host='0.0.0.0' to make it accessible from your local network (e.g., from your phone).
+    # Use host='0.0.0.0' to make it accessible from the local network
     app.run(host='0.0.0.0', port=5000, debug=True)
